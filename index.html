@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Connection: Active</title>
+    <style>
+      body {
+        background-color: black;
+        color: #5eef3e;
+        font-family: 'Courier New';
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen">
+      <p>Connected to server.</p>
+    </div>
+    <script>
+      var content = '';
+      function appendKey(charCode) {
+        content += String.fromCharCode(charCode);
+        var el = document.getElementById('content');
+        el.innerHTML = content;
+      }
+
+      function newLine(append_history) {
+        var $screen = document.getElementById('screen');
+        var $currentLine = document.getElementById('current_line');
+        if (append_history) {
+          var $history = document.createElement('p');
+          $history.innerHTML = '$ ' + content;
+          content = '';
+        }
+        var $newLine = document.createElement('p');
+        $newLine.innerHTML = '$ ';
+        var $content = document.createElement('span');
+        $content.setAttribute('id', 'content');
+        $newLine.appendChild($content);
+        var $cursor = document.createElement('span');
+        $cursor.setAttribute('class', 'cursor');
+        $cursor.innerHTML = '&#x2588;';
+        $newLine.appendChild($cursor);
+        $newLine.setAttribute('id', 'current_line');
+        if ($currentLine) {
+          $screen.removeChild($currentLine);
+        }
+        if ($history) {
+          $screen.appendChild($history);
+        }
+        $screen.appendChild($newLine);
+      }
+
+      function backspace() {
+        if (content.length === 0) {
+          return;
+        }
+        content = content.substring(0, content.length - 1);
+        var $content = document.getElementById('content');
+        $content.innerHTML = content;
+      }
+
+      newLine(false);
+      
+      document.addEventListener('keypress', function(event) {
+        console.log('keypress: %o', event.charCode);
+        if (event.charCode === 13) {
+          newLine(true);
+        } else {
+          appendKey(event.charCode);
+        }
+      });
+
+      document.addEventListener('keydown', function(event) {
+        console.log('keydown: %o', event.keyCode);
+        if (event.keyCode === 8) {
+          backspace();
+        }
+      });
+    </script>
+  </body>
+</html>
