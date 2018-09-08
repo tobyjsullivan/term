@@ -16,20 +16,15 @@
     </div>
     <script>
       var content = '';
+      var $ = (id) => document.getElementById(id);
       function appendKey(charCode) {
         content += String.fromCharCode(charCode);
-        var el = document.getElementById('content');
-        el.innerHTML = content;
+        var $content = $('content');
+        $content.innerHTML = content;
       }
 
-      function newLine(append_history) {
-        var $screen = document.getElementById('screen');
-        var $currentLine = document.getElementById('current_line');
-        if (append_history) {
-          var $history = document.createElement('p');
-          $history.innerHTML = '$ ' + content;
-          content = '';
-        }
+      function newLine() {
+        var $screen = $('screen');
         var $newLine = document.createElement('p');
         $newLine.innerHTML = '$ ';
         var $content = document.createElement('span');
@@ -39,13 +34,7 @@
         $cursor.setAttribute('class', 'cursor');
         $cursor.innerHTML = '&#x2588;';
         $newLine.appendChild($cursor);
-        $newLine.setAttribute('id', 'current_line');
-        if ($currentLine) {
-          $screen.removeChild($currentLine);
-        }
-        if ($history) {
-          $screen.appendChild($history);
-        }
+        $newLine.setAttribute('id', 'current-line');
         $screen.appendChild($newLine);
       }
 
@@ -54,27 +43,66 @@
           return;
         }
         content = content.substring(0, content.length - 1);
-        var $content = document.getElementById('content');
+        var $content = $('content');
         $content.innerHTML = content;
       }
 
-      newLine(false);
-      
-      document.addEventListener('keypress', function(event) {
-        console.log('keypress: %o', event.charCode);
+      function executeCurrent() {
+        var current = content;
+        content = '';
+        var $screen = $('screen');
+        var $currentLine = $('current-line');
+        $screen.removeChild($currentLine);
+        appendToHistory(current);
+
+        var command = parseCommand(current);
+        evaluate(command);
+        newLine();
+      }
+
+      function parseCommand(content) {
+        return content.split(' ');
+      }
+
+      function evaluate(command) {
+        console.log('Execute: %o', command);
+        var executable = command[0];
+        if (executable === 'help') {
+          // TODO: Render output
+        } else {
+          // TODO: Render unknown command
+        }
+      }
+
+      function appendToHistory(content) {
+        var $screen = $('screen');
+        var $history = document.createElement('p');
+        $history.innerHTML = '$ ' + content;
+        $screen.appendChild($history);
+      }
+
+      function handleKeyPressed(event) {
         if (event.charCode === 13) {
-          newLine(true);
+          executeCurrent();
         } else {
           appendKey(event.charCode);
         }
-      });
+      }
 
-      document.addEventListener('keydown', function(event) {
-        console.log('keydown: %o', event.keyCode);
+      function handleKeyDown(event) {
         if (event.keyCode === 8) {
           backspace();
         }
-      });
+      }
+
+      function init() {
+        document.addEventListener('keypress', handleKeyPressed);
+        document.addEventListener('keydown', handleKeyDown);
+
+        newLine();
+      }
+
+      init();
     </script>
   </body>
 </html>
