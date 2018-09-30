@@ -93,6 +93,10 @@
       function handleKeyDown(event) {
         if (event.keyCode === 8) {
           backspace();
+          event.preventDefault();
+        } else if (event.keyCode === 9) {
+          // TAB
+          event.preventDefault();
         }
       }
 
